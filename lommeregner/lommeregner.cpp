@@ -5,7 +5,8 @@ int main(int argc, char* argv[]) {
     double num1 = 0, num2 = 0;
     char op = '?';
 
-    std::println(R"(Lommeregner, Gorking stil.
+    std::println(R"(
+Lommeregner, Gorking stil.
   3 + 5 = 8
   3 - 5 = -2
   3 * 5 = 15
