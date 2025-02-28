@@ -1,10 +1,25 @@
 #include <print>
 #include <iostream>
+#include <unordered_map>
+
+double add(double a, double b) { return a + b; }
+double sub(double a, double b) { return a - b; }
+double mul(double a, double b) { return a * b; }
+double div(double a, double b) { return a / b; }
+double power(double a, double b) { return std::powl(a, b); }
+double sqrt(double a, double b) { return std::powl(b, 1.0 / a); }
+
+static auto const ops = std::unordered_map<char, double(*)(double, double)>{
+    {'+', add},
+    {'-', sub},
+    {'*', mul},
+    {'x', mul},
+    {'/', div},
+    {'^', power},
+    {'v', sqrt},
+};
 
 int main(int argc, char* argv[]) {
-    double num1 = 0, num2 = 0;
-    char op = '?';
-
     std::println(R"(
 Lommeregner, Gorking stil.
   3 + 5 = 8
@@ -16,43 +31,16 @@ Lommeregner, Gorking stil.
 )");
     std::println("Angiv [tal] [+-*/^v] [tal]:");
 
-    while (std::cin >> num1) {
-        std::cin >> op;
-        std::cin >> num2;
+    double num1 = 0, num2 = 0;
+    char op = '?';
 
-        switch (op) {
-        case '+':
-            std::println(" = {}", num1 + num2);
-            break;
-
-        case '-':
-            std::println(" = {}", num1 - num2);
-            break;
-
-        case '*':
-            std::println(" = {}", num1 * num2);
-            break;
-
-        case '/':
-            if (num2 == 0) {
-                std::println("Kan ikke dividere med nul");
-                return 1;
-            }
-            std::println(" = {}", num1 / num2);
-            break;
-
-        case '^':
-            std::println(" = {}", std::powl(num1, num2));
-            break;
-
-        case 'v':
-            std::println(" = {}", std::powl(num2, 1.0 / num1));
-            break;
-
-        default:
+    while (std::cin >> num1 >> op >> num2) {
+        if (!ops.contains(op)) {
             std::println("Ukendt operation '{}'", op);
             return 1;
         }
+
+        std::println(" = {}", ops.at(op)(num1, num2));
     }
 
     return 0;
