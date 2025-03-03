@@ -2,5 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/spac/v17
-/lommeregner/.vs/lommeregner
+.vs/*
+lommeregner/*
+lommeregner/x64
