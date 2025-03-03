@@ -27,8 +27,10 @@ std::array<int,4> generate_code() {
 }
 
 int main() {
-	for (int i = 0; i < 10; i++)
-		std::println("{}", generate_code());
+	for (int i = 0; i < 10; i++) {
+		auto const code = generate_code();
+		std::println("{}* {}* {}* {}*", colour_codes[code[0]], colour_codes[code[1]], colour_codes[code[2]], colour_codes[code[3]]);
+	}
 
 	std::println("\033[91m test");
 }
