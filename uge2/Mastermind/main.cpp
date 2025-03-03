@@ -76,18 +76,24 @@ char char_to_index(char c) {
 // Read the users guess from the console
 std::optional<code> read_guess() {
 	code out = { 0,0,0,0 };
-	std::cin >> (char&)out[0] >> (char&)out[1] >> (char&)out[2] >> (char&)out[3];
-	for (int& i : out) {
-		int index = char_to_index(i);
-		if (i == -1) {
-			i = 0;
+	std::string s;
+	std::cin >> s;
+	if (s.size() != 4) {
+		std::println("Angiv 4 farver");
+		//std::println("\033[AAngiv 4 farver");//\033[2K
+		return {};
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int const index = char_to_index(s[i]);
+		if (index == -1) {
 			std::println("Ugyldig farve");
 			return {};
 		}
 
-		i = index;
+		out[i] = index;
 	}
-	// TODO check
+
 	return out;
 }
 
@@ -107,12 +113,12 @@ void print_help() {
 }
 
 int main() {
-	// Set the console code-page, so nordic character aren't garbled.
+	// Set the console code-page, so nordic characters aren't garbled.
 	SetConsoleOutputCP(1252);
 	print_help();
 
 	// Generate the colours to guess
-	auto const c = generate_code();
+	auto const combo_to_guess = generate_code();
 	std::print("Gæt den hemmelig kode på 4 farver: ");
 
 	int num_guesses = 1;
@@ -133,12 +139,12 @@ int main() {
 			
 			// Print the red sticks for each correct location
 			std::print("\033[91m");
-			int const locs = compare_locations(c, *guess);
+			int const locs = compare_locations(combo_to_guess, *guess);
 			std::print("{}", std::string(locs, '|'));
 
 			// Print the white sticks for each wrong location, but correct colour
 			std::print("\033[37m");
-			int const cols = compare_colors(c, *guess);
+			int const cols = compare_colors(combo_to_guess, *guess);
 			std::print("{}", std::string(cols, '|'));
 
 			// Fill out the remaing space if needed
