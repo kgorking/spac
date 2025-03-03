@@ -6,6 +6,7 @@
 #include <random>
 #include <iostream>
 #include <optional>
+#define NOMINMAX
 #include <Windows.h>
 
 using namespace std::string_view_literals;
@@ -87,12 +88,17 @@ std::optional<code> read_guess() {
 	return out;
 }
 
+bool valid(code const c) {
+	return !std::ranges::contains(c, -1);
+}
+
 void print_help() {
-	std::println(R"(Mastermind!
-	Gæt de 4 farver i den rigtige rækkefølge.
-		Tilladte farver er: {}R: rød, {}G :grøn, {}Y: gul, {}B: blå, {}M: magenta, {}C: cyan
-	Du får en rød pind for hver korrect placeret farve.
-	"Du får en hvid pind for hver korrekt farve der er placeret forkert.)",
+	std::println("Mastermind!\n"
+		"Gæt de 4 farver i den rigtige rækkefølge.\n"
+		"	Tilladte farver er: {}R: rød, {}G :grøn, {}Y: gul, {}B: blå, {}M: magenta, {}C: cyan\033[0m\n"
+		"Du får en rød pind for hver korrect placeret farve.\n"
+		"Du får en hvid pind for hver korrekt farve der er placeret forkert.\n"
+		"Du har 12 forsøg.\n",
 	colour_codes[0], colour_codes[1], colour_codes[2], colour_codes[3], colour_codes[4], colour_codes[5]);
 }
 
@@ -109,23 +115,37 @@ int main() {
 		std::optional<code> const guess = read_guess();
 
 		if (guess) {
+			if (!valid(*guess)) {
+				std::print("Ugyldig farve fundet!");
+				exit(1);
+				continue;
+			}
+
+			std::print("{:2}  ", num_guesses);
 			print_code(guess.value());
 
 			if (4 == compare_locations(c, *guess)) {
-				std::println("Du gættede rigtigt!");
+				std::println("Du gættede rigtigt i {} forsøg!", num_guesses);
 				break;
 			}
 			
 			std::print("\033[91m");
 			int const locs = compare_locations(c, *guess);
-			std::print("{:4}", std::string(locs, '|'));
+			std::print("{}", std::string(locs, '|'));
 
-			std::print(" \033[37m");
+			std::print("\033[37m");
 			int const cols = compare_colors(c, *guess);
-			std::print("{:4}", std::string(cols, '|'));
+			std::print("{}", std::string(cols, '|'));
+
+			if (locs + cols < 4)
+				std::print("{}", std::string(4 - (locs + cols), ' '));
 
 			std::print("   \033[0m");
 			num_guesses += 1;
 		}
+	}
+
+	if (num_guesses == 13) {
+		std::println("Du gættede ikke den rigtige kombination i tide :(");
 	}
 }
