@@ -56,7 +56,7 @@ int main() {
 	// Print help message about how to play
 	print_help();
 
-	// Generate the colours to guess
+	// Generate the colour to guess
 	auto const combo_to_guess = generate_code();
 	cp_print("Gæt den hemmelige kode på 4 farver: ");
 	//cp_print_code(combo_to_guess);
