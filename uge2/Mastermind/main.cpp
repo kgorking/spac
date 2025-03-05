@@ -1,9 +1,4 @@
-#include <print>
-#include <array>
-#include <ranges>
-#include <algorithm>
-#include <iostream>
-#include <optional>
+import std;
 #define NOMINMAX
 #include <Windows.h>
 
