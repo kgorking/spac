@@ -15,7 +15,7 @@ export code generate_code() {
 }
 
 // Count the correct colours and wrong locations
-export std::pair<int, int> compare_colors(code actual, code guess) {
+export auto compare_colors(code actual, code guess) -> std::pair<int, int> {
 	// Count the number of colours in 'actual'
 	int hist_actual[6] = { 0,0,0,0,0,0 };
 	for (int i : actual)
@@ -62,7 +62,7 @@ export std::pair<int, int> compare_colors(code actual, code guess) {
 }
 
 // Convert a character into its colour
-Colour char_to_color(char c) {
+auto char_to_color(char c) -> Colour {
 	switch (c) {
 	case 'r': case 'R': return Colour::Red;
 	case 'g': case 'G': return Colour::Green;
@@ -75,7 +75,7 @@ Colour char_to_color(char c) {
 	}
 }
 
-export std::expected<code, int> code_from_string(std::string_view sv) {
+export auto code_from_string(std::string_view sv) -> std::expected<code, int> {
 	if (sv.size() != 4) {
 		return std::unexpected(0);
 	}
