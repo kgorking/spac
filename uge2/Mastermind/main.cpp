@@ -63,7 +63,7 @@ int main() {
 	// Generate the colours to guess
 	auto const combo_to_guess = generate_code();
 	cp_print("Gæt den hemmelig kode på 4 farver: ");
-	cp_print_code(combo_to_guess);
+	//cp_print_code(combo_to_guess);
 
 	int num_guesses = 1;
 	while (num_guesses <= 12) {

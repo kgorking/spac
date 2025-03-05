@@ -14,41 +14,49 @@ export code generate_code() {
 	return out;
 }
 
-// Count the number correct colours in wrong locations
+// Count the correct colours and wrong locations
 export std::pair<int, int> compare_colors(code actual, code guess) {
 	// Count the number of colours in 'actual'
 	int hist_actual[6] = { 0,0,0,0,0,0 };
 	for (int i : actual)
 		hist_actual[i] += 1;
 
+	int correct_locations = 0;
+	int wrong_locations = 0;
 
-	std::array<bool, 4> wrong_locations{};
-	std::array<bool, 4> correct_locations{};
-
+	// Count correct locations first
 	for (int i = 0; i < 4; i++) {
 		// If the colour is not in the histogram, ignore it
 		if (hist_actual[guess[i]] == 0)
 			continue;
 
-		if (guess[i] != actual[i]) {
-			// The two colours are not equal.
-			// If the guess colour exists in the histogram of the actual code,
-			// count it as in the wrong location.
-			wrong_locations[i] = hist_actual[guess[i]] > 0;
-		}
-		else {
-			correct_locations[i] = true;
-		}
+		if (guess[i] == actual[i] && (hist_actual[guess[i]] > 0)) {
+			correct_locations += 1;
 
-		// Decrease the histogram count.
-		hist_actual[guess[i]] -= 1;
+			// Decrease the histogram count.
+			hist_actual[guess[i]] -= 1;
+		}
+	}
+
+	// Count wrong locations last
+	for (int i = 0; i < 4; i++) {
+		// If the colour is not in the histogram, ignore it
+		if (hist_actual[guess[i]] == 0)
+			continue;
+
+		// The two colours are not equal.
+		// If the guess colour exists in the histogram of the actual code,
+		// count it as in the wrong location.
+		if (guess[i] != actual[i] && (hist_actual[guess[i]] > 0)) {
+			wrong_locations += 1;
+
+			// Decrease the histogram count.
+			hist_actual[guess[i]] -= 1;
+		}
 	}
 
 	// Return the number of correct locations and correct colours in wrong locations
-	auto reduce = std::bind_back(std::ranges::fold_left, 0, std::plus{}); // why is there no std::ranges::reduce?
-	int const num_correct_loc = reduce(correct_locations);
-	int const num_wrong_loc = reduce(wrong_locations);
-	return { num_correct_loc, num_wrong_loc };
+	return { correct_locations, wrong_locations };
 }
 
 // Convert a character into its colour-code index
