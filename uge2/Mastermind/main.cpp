@@ -5,13 +5,9 @@ import colourcode;
 #define NOMINMAX
 #include <Windows.h>
 
-void print_allowed_colours() {
-	cp_print("   Tilladte farver er: ", Red, "R: rød, ", Green, "G :grøn, ", Yellow, "Y: gul, ", Blue, "B: blå, ", Magenta, "M: magenta, ", Cyan, "C: cyan\n");
-}
-
 void print_help() {
 	cp_println("Mastermind!\nGæt de 4 farver i den rigtige rækkefølge.");
-	print_allowed_colours();
+	cp_print("   Tilladte farver er: ", Red, "R: rød, ", Green, "G :grøn, ", Yellow, "Y: gul, ", Blue, "B: blå, ", Magenta, "M: magenta, ", Cyan, "C: cyan\n");
 	cp_println(
 		"Du får en ", Red, "rød", Default, " pind for hver korrect placeret farve.\n"
 		"Du får en ", WhiteBg, "hvid", Default, " pind for hver korrekt farve der er placeret forkert.\n"
