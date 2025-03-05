@@ -25,6 +25,9 @@ export std::pair<int, int> compare_colors(code actual, code guess) {
 	int wrong_locations = 0;
 
 	// Count correct locations first
+	// This is needed fx. when comparing guess RRRR to actual CRCR
+	// If not separated, it would return 1 correct location and 1 wrong location,
+	// when it should return 2 correct locations
 	for (int i = 0; i < 4; i++) {
 		// If the colour is not in the histogram, ignore it
 		if (hist_actual[guess[i]] == 0)
@@ -55,7 +58,6 @@ export std::pair<int, int> compare_colors(code actual, code guess) {
 		}
 	}
 
-	// Return the number of correct locations and correct colours in wrong locations
 	return { correct_locations, wrong_locations };
 }
 
