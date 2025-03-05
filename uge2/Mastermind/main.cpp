@@ -97,6 +97,5 @@ int main() {
 		cp_println(Colour::Red, "\nDu gættede ikke den rigtige kombination i tide :(");
 		cp_print("Den korrekt kode var ");
 		cp_print_code(combo_to_guess);
-		
 	}
 }
