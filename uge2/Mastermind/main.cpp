@@ -1,162 +1,106 @@
 import std;
+import colourprint;
+import colourcode;
+
 #define NOMINMAX
 #include <Windows.h>
 
-// Alias for a color combination to guess
-using code = std::array<int, 4>;
-
-// Console color commands
-constexpr auto colour_codes = std::to_array({
-	"\033[91m", // rød
-	"\033[92m", // grøn
-	"\033[93m", // gul
-	"\033[94m", // blå
-	"\033[95m", // magenta
-	"\033[96m", // cyan
-	});
-
-
-int generate_random_colour() {
-	return std::rand() % colour_codes.size();
-}
-
-code generate_code() {
-	code out;
-	std::ranges::generate_n(out.begin(), 4, generate_random_colour);
-	return out;
-}
-
-// Print the users guess, as colour coded balls
-void print_code(code const c) {
-	std::print("{}* {}* {}* {}* \033[0m", colour_codes[c[0]], colour_codes[c[1]], colour_codes[c[2]], colour_codes[c[3]]);
-}
-
-// Count the number of equal locations in the guess
-int compare_locations(code actual, code guess) {
-	int equal = 0;
-	for (int i = 0; i < 4; i++)
-		equal += actual[i] == guess[i];
-	return equal;
-}
-
-int compare_colors(code actual, code guess) {
-	// Count the number of colours in the guess
-	int hist_guess[6] = { 0,0,0,0,0,0 };
-	for (int i : actual)
-		hist_guess[i] += 1;
-
-	// Count it, if a guess is wrong, but the colour is present in the actual value
-	int equal = 0;
-	for (int i = 0; i < 4; i++) {
-		if (guess[i] != actual[i] && hist_guess[guess[i]] > 0)
-			equal += 1;
-	}
-	return equal;
-}
-
-// Convert a character into its colour-code index
-char char_to_index(char c) {
-	switch (c) {
-	case 'r': case 'R': return 0;
-	case 'g': case 'G': return 1;
-	case 'y': case 'Y': return 2;
-	case 'b': case 'B': return 3;
-	case 'm': case 'M': return 4;
-	case 'c': case 'C': return 5;
-	default:
-		return -1;
-	}
-}
-
-// Read the users guess from the console
-std::optional<code> read_guess() {
-	code out = { 0,0,0,0 };
-	std::string s;
-	std::cin >> s;
-	if (s.size() != 4) {
-		std::println("Angiv 4 farver");
-		//std::println("\033[AAngiv 4 farver");//\033[2K
-		return {};
-	}
-
-	for (int i = 0; i < 4; i++) {
-		int const index = char_to_index(s[i]);
-		if (index == -1) {
-			std::println("Ugyldig farve");
-			return {};
-		}
-
-		out[i] = index;
-	}
-
-	return out;
-}
-
-// Check if a code is valid
-bool valid(code const c) {
-	return !std::ranges::contains(c, -1);
+void print_allowed_colours() {
+	cp_print("   Tilladte farver er: ", Red, "R: rød, ", Green, "G :grøn, ", Yellow, "Y: gul, ", Blue, "B: blå, ", Magenta, "M: magenta, ", Cyan, "C: cyan\n");
 }
 
 void print_help() {
-	std::println("Mastermind!\n"
-		"Gæt de 4 farver i den rigtige rækkefølge.\n"
-		"	Tilladte farver er: {}R: rød, {}G :grøn, {}Y: gul, {}B: blå, {}M: magenta, {}C: cyan\033[0m\n"
-		"Du får en \033[91mrød\033[0m pind for hver korrect placeret farve.\n"
-		"Du får en \033[30m\033[107mhvid\033[0m pind for hver korrekt farve der er placeret forkert.\n"
-		"Du har 12 forsøg.\n",
-		colour_codes[0], colour_codes[1], colour_codes[2], colour_codes[3], colour_codes[4], colour_codes[5]);
+	cp_println("Mastermind!\nGæt de 4 farver i den rigtige rækkefølge.");
+	print_allowed_colours();
+	cp_println(
+		"Du får en ", Red, "rød", Default, " pind for hver korrect placeret farve.\n"
+		"Du får en ", WhiteBg, "hvid", Default, " pind for hver korrekt farve der er placeret forkert.\n"
+		"Du har 12 forsøg.\n");
+}
+
+// Read the users guess from the console
+auto read_guess() -> std::optional<code> {
+	// Save current cursor position
+	std::print("\x1b[s");
+
+	// Read the users guess
+	std::string s;
+	std::cin >> s;
+
+	// Check for exit/quit
+	if (s == "exit" || s == "quit")
+		exit(0);
+
+	// Parse the code and return it if it's valid
+	if (auto const code = code_from_string(s); code.has_value()) {
+		return *code;
+	}
+	else {
+		// Print error message
+		switch (code.error()) {
+			case 0:  cp_print(Colour::Red, "Angiv 4 farver"); break;
+			case 1:  cp_print(Colour::Red, "Ugyldig farve."); break;
+			default: cp_print(Colour::Red, "Ukendt fejl."); break;
+		}
+
+		// Restore previous cursor position and delete user input
+		std::print("\x1b[u\x1b[0K");
+
+		return {};
+	}
 }
 
 int main() {
-	// Set the console code-page, so nordic characters aren't garbled.
+	// Set the console code-page, so Nordic characters aren't garbled.
 	SetConsoleOutputCP(1252);
+
+	// Use current time as seed for random generator
+	std::srand(static_cast<unsigned>(std::time(0)));
+
+	// Print help message about how to play
 	print_help();
 
 	// Generate the colours to guess
 	auto const combo_to_guess = generate_code();
-	std::print("Gæt den hemmelig kode på 4 farver: ");
+	cp_print("Gæt den hemmelig kode på 4 farver: ");
+	cp_print_code(combo_to_guess);
 
 	int num_guesses = 1;
 	while (num_guesses <= 12) {
 		std::optional<code> const guess = read_guess();
 
-		if (guess) {
-			if (!valid(*guess)) {
-				// Invalid colours are a hard exit, because it messes up
-				// my formatting otherwise.
-				std::print("Ugyldig farve fundet!");
-				exit(1);
-			}
+		if (!guess)
+			continue;
 
-			// Print the number of guesses made
-			std::print("{:2}  ", num_guesses);
-			print_code(guess.value());
+		// Print the number of guesses made and the entered colour code
+		cp_print(std::format("{:2}  ", num_guesses));
+		auto const& c = *guess;
+		cp_print_code(c);
 			
-			// Print the red sticks for each correct location
-			std::print("\033[91m");
-			int const locs = compare_locations(combo_to_guess, *guess);
-			std::print("{}", std::string(locs, '|'));
+		// Print the red sticks for each correct location
+		// and print the white sticks for each wrong location, but correct colour
+		auto const [locs, cols] = compare_colors(combo_to_guess, c);
+		cp_print(Colour::Red, std::string(locs, '|'));
+		cp_print(Colour::Default, std::string(cols, '|'));
 
-			// Print the white sticks for each wrong location, but correct colour
-			std::print("\033[37m");
-			int const cols = compare_colors(combo_to_guess, *guess);
-			std::print("{}", std::string(cols, '|'));
+		// Fill out the remaining space if needed
+		if (locs + cols < 4)
+			cp_print(std::string(4 - (locs + cols), ' '));
 
-			// Fill out the remaing space if needed
-			if (locs + cols < 4)
-				std::print("{}", std::string(4 - (locs + cols), ' '));
+		cp_print("   ");
+		num_guesses += 1;
 
-			std::print("   \033[0m");
-			num_guesses += 1;
-
-			if (4 == locs) {
-				std::println("Du gættede rigtigt i {} forsøg!", num_guesses);
-				break;
-			}
+		// Check for win-condition
+		if (4 == locs) {
+			cp_print(Colour::Green, "\nDu gættede rigtigt i ", num_guesses, " forsøg!");
+			break;
 		}
 	}
 
 	if (num_guesses > 12) {
-		std::println("Du gættede ikke den rigtige kombination i tide :(");
+		cp_println(Colour::Red, "\nDu gættede ikke den rigtige kombination i tide :(");
+		cp_print("Den korrekt kode var ");
+		cp_print_code(combo_to_guess);
+		
 	}
 }
