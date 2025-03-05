@@ -61,7 +61,7 @@ export std::pair<int, int> compare_colors(code actual, code guess) {
 	return { correct_locations, wrong_locations };
 }
 
-// Convert a character into its colour-code index
+// Convert a character into its colour
 Colour char_to_color(char c) {
 	switch (c) {
 	case 'r': case 'R': return Colour::Red;
