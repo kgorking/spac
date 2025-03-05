@@ -1,6 +1,4 @@
-#include <print>
-#include <iostream>
-#include <unordered_map>
+import std;
 
 static auto const ops = std::unordered_map<char, double(*)(double, double)>{
     {'+', +[](double a, double b) { return a + b; }},
