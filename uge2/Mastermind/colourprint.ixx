@@ -5,6 +5,7 @@ import std;
 // Contains functions to do coloured output to the console
 //
 
+// The supported colours
 export enum Colour {
 	Red,
 	Green,
@@ -33,21 +34,27 @@ constexpr auto colour_codes = std::to_array({
 	"\033[107m", // hvid baggrund
 	});
 
-
+// Change the text colour
 void print_one(Colour clr) {
 	std::print("{}", colour_codes[clr]);
 }
 
+// Print whatever
 void print_one(auto other) {
 	std::print("{}", other);
 }
 
+// Print a bunch of arguments by sending each to 'print_one'*'
+// Text colour is set to default before and after printing
 export void cp_print(auto&& ...args) {
 	print_one(Colour::Default);
 	(print_one(args), ...);
 	print_one(Colour::Default);
 }
 
+// Print a bunch of arguments by sending each to 'print_one'
+// Prints a newline at end.
+// Text colour is set to default before and after printing
 export void cp_println(auto&& ...args) {
 	print_one(Colour::Default);
 	(print_one(args), ...);
@@ -55,6 +62,7 @@ export void cp_println(auto&& ...args) {
 	std::println();
 }
 
+// Print a colour code with colours
 export void cp_print_code(code const c) {
 	cp_print(c[0], "* ", c[1], "* ", c[2], "* ", c[3], "* ");
 }
