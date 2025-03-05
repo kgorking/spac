@@ -33,7 +33,7 @@ export auto compare_colors(code actual, code guess) -> std::pair<int, int> {
 		if (hist_actual[guess[i]] == 0)
 			continue;
 
-		if (guess[i] == actual[i] && (hist_actual[guess[i]] > 0)) {
+		if (guess[i] == actual[i]) {
 			correct_locations += 1;
 
 			// Decrease the histogram count.
@@ -50,7 +50,7 @@ export auto compare_colors(code actual, code guess) -> std::pair<int, int> {
 		// The two colours are not equal.
 		// If the guess colour exists in the histogram of the actual code,
 		// count it as in the wrong location.
-		if (guess[i] != actual[i] && (hist_actual[guess[i]] > 0)) {
+		if (guess[i] != actual[i]) {
 			wrong_locations += 1;
 
 			// Decrease the histogram count.
