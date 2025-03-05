@@ -129,7 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="colourcode.ixx" />
+    <ClCompile Include="combination.ixx" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="colourprint.ixx" />
   </ItemGroup>

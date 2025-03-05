@@ -1,6 +1,6 @@
 import std;
 import colourprint;
-import colourcode;
+import combination;
 
 #define NOMINMAX
 #include <Windows.h>
@@ -15,7 +15,7 @@ void print_help() {
 }
 
 // Read the users guess from the console
-auto read_guess() -> std::optional<code> {
+auto read_guess() -> std::optional<combi> {
 	// Save current cursor position
 	std::print("\x1b[s");
 
@@ -28,7 +28,7 @@ auto read_guess() -> std::optional<code> {
 		exit(0);
 
 	// Parse the code and return it if it's valid
-	if (auto const code = code_from_string(s); code.has_value()) {
+	if (auto const code = combination_from_string(s); code.has_value()) {
 		return *code;
 	}
 	else {
@@ -57,13 +57,13 @@ int main() {
 	print_help();
 
 	// Generate the colour to guess
-	auto const combo_to_guess = generate_code();
+	auto const combo_to_guess = generate_color_combination();
 	cp_print("Gæt den hemmelige kode på 4 farver: ");
 	//cp_print_code(combo_to_guess);
 
 	int num_guesses = 1;
 	while (num_guesses <= 12) {
-		std::optional<code> const guess = read_guess();
+		std::optional<combi> const guess = read_guess();
 
 		if (!guess)
 			continue;
@@ -71,11 +71,11 @@ int main() {
 		// Print the number of guesses made and the entered colour code
 		cp_print(std::format("{:2}  ", num_guesses));
 		auto const& c = *guess;
-		cp_print_code(c);
+		cp_print_combi(c);
 			
 		// Print the red sticks for each correct location
 		// and print the white sticks for each wrong location, but correct colour
-		auto const [locs, cols] = compare_colors(combo_to_guess, c);
+		auto const [locs, cols] = compare_combinations(combo_to_guess, c);
 		cp_print(Colour::Red, std::string(locs, '|'));
 		cp_print(Colour::Default, std::string(cols, '|'));
 
@@ -96,6 +96,6 @@ int main() {
 	if (num_guesses > 12) {
 		cp_println(Colour::Red, "\nDu gættede ikke den rigtige kombination i tide :(");
 		cp_print("Den korrekt kode var ");
-		cp_print_code(combo_to_guess);
+		cp_print_combi(combo_to_guess);
 	}
 }

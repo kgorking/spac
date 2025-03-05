@@ -18,9 +18,6 @@ export enum Colour {
 	Max
 };
 
-// Alias for a color combination to guess
-export using code = std::array<Colour, 4>;
-
 
 // Console color commands
 constexpr auto colour_codes = std::to_array({
@@ -60,9 +57,4 @@ export void cp_println(auto&& ...args) {
 	(print_one(args), ...);
 	print_one(Colour::Default);
 	std::println();
-}
-
-// Print a colour code with colours
-export void cp_print_code(code const c) {
-	cp_print(c[0], "* ", c[1], "* ", c[2], "* ", c[3], "* ");
 }

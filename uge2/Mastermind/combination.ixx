@@ -1,4 +1,4 @@
-export module colourcode;
+export module combination;
 import std;
 import colourprint;
 
@@ -6,16 +6,19 @@ import colourprint;
 // Contains code to manage colour codes
 //
 
-export code generate_code() {
+// Alias for a color combination to guess
+export using combi = std::array<Colour, 4>;
+
+export combi generate_color_combination() {
 	auto generate_random_colour = []() { return Colour(std::rand() % Colour::Default); };
 
-	code out;
+	combi out;
 	std::ranges::generate_n(out.begin(), 4, generate_random_colour);
 	return out;
 }
 
 // Count the correct colours and wrong locations
-export auto compare_colors(code actual, code guess) -> std::pair<int, int> {
+export auto compare_combinations(combi actual, combi guess) -> std::pair<int, int> {
 	// Count the number of colours in 'actual'
 	int hist_actual[6] = { 0,0,0,0,0,0 };
 	for (int i : actual)
@@ -75,12 +78,12 @@ auto char_to_color(char c) -> Colour {
 	}
 }
 
-export auto code_from_string(std::string_view sv) -> std::expected<code, int> {
+export auto combination_from_string(std::string_view sv) -> std::expected<combi, int> {
 	if (sv.size() != 4) {
 		return std::unexpected(0);
 	}
 
-	code out;
+	combi out;
 	std::ranges::fill(out, Colour::Default);
 
 	for (int i = 0; i < 4; i++) {
@@ -93,4 +96,9 @@ export auto code_from_string(std::string_view sv) -> std::expected<code, int> {
 	}
 
 	return out;
+}
+
+// Print a colour code with colours
+export void cp_print_combi(combi const c) {
+	cp_print(c[0], "* ", c[1], "* ", c[2], "* ", c[3], "* ");
 }
