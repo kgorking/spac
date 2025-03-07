@@ -72,7 +72,7 @@ class Hand:
 class Player:
     def __init__(self):
         self.hand = Hand()
-        self.bust = False
+        self.done = False
 
     def __repr__(self):
         return f"{self.hand.value:2}  {self.hand.cards}"
@@ -83,7 +83,25 @@ class Player:
     def take_card(self, deck: Deck, count = 1):
         for i in range(count):
             self.hand.add_card(deck.deal_card())
-        self.bust = self.value() > 21
+        self.done = self.bust()
+
+    def bust(self):
+        return self.value() > 21
+
+    def hit_or_stand(self, deck: Deck):
+        if self.done:
+            return True
+
+        choice = input("(h)it or (s)tand? ")
+        while choice not in ['s', 'h']:
+            choice = input("I said, (h)it or (s)tand? ")
+
+        if choice == 'h':
+            self.take_card(deck)
+            self.done = (self.value() >= 21)
+            print(f"Player: {self}")
+        elif choice == 's':
+            self.done = True
 
 
 class Dealer(Player):
@@ -100,11 +118,16 @@ class Dealer(Player):
     def partial_value(self):
         return super().value() - self.hand.cards[0].value()
 
+    def hit_or_stand(self, deck: Deck, player: Player):
+        if self.value() < max(17, player.value()):
+            self.take_card(deck)
+            self.done = (self.value() >= 21)
+            print(f"Dealer takes card: {self}")
+        else:
+            self.done = True
+            print(f"Dealer stands with: {self}")
 
 class Game:
-    def should_dealer_hit(self):
-        pass
-
     def run(self):
         deck = Deck()
         dealer = Dealer()
@@ -118,47 +141,24 @@ class Game:
 
         print()
 
-        run = True
-        player_done = False
-        dealer_done = False
+        while not (player.done and dealer.done):
+            if not player.done:
+                player.hit_or_stand(deck)
 
-        while run:
-            if not player_done:
-                choice = input("(h)it or (s)tand? ")
-                if choice == 'h':
-                    player.take_card(deck)
-                    print(f"Player: {player}")
-                elif choice == 's':
-                    player_done = True
-                    run = False
-                else:
-                    print("I said,")
-                    continue
+            if not dealer.done:
+                dealer.hit_or_stand(deck, player)
 
-                if player.bust:
-                    print(f"Player loses:  {player}")
-                    run = False
-                    break
-                elif player.value() == 21:
-                    print("Player has Blackjack!")
-                    run = False
+        dealer.hidden = False
+        if player.value() == 21:
+            print(f"Player has Blackjack! {player}")
+        if dealer.value() == 21:
+            print(f"Dealer has Blackjack! {dealer}")
 
-            if dealer.value() < min(17, player.value()):
-                dealer.take_card(deck)
-                print(f"Dealer takes card: {dealer}")
-            else:
-                print("Dealer stands")
-
-            if dealer.bust:
-                print(f"Dealer loses:  {dealer}")
-                run = False
-                break
-            elif dealer.value() == 21:
-                dealer.hidden = False
-                print(f"Dealer has Blackjack! {dealer}")
-                run = False
-
-        if not (dealer.bust or player.bust):
+        if player.bust():
+            print(f"Player loses:  {player}")
+        elif dealer.bust():
+            print(f"Dealer loses:  {dealer}")
+        else:
             print()
             print(f"Player: {player}")
             print(f"Dealer: {dealer}")
