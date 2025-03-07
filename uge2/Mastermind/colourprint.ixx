@@ -32,7 +32,7 @@ constexpr auto colour_codes = std::to_array({
 	"\033[0m",  // default
 	"\033[30m", // sort
 	"\033[107m", // hvid baggrund
-	"\033[101m", // hvid baggrund
+	"\033[101m", // rød baggrund
 	});
 
 // Change the text colour
