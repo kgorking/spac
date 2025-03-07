@@ -59,7 +59,7 @@ int main() {
 	// Generate the colour to guess
 	auto const combo_to_guess = generate_color_combination();
 	cp_print("Gæt den hemmelige kode på 4 farver: ");
-	//cp_print_combi(combo_to_guess);
+	//cp_print_combi(combo_to_guess); // debug, prints the generated code to guess
 	cp_println();
 
 	// Set up guess counter and print initial guess.
