@@ -69,7 +69,7 @@ auto char_to_color(char c) -> Colour {
 	switch (c) {
 	case 'r': case 'R': return Colour::Red;
 	case 'g': case 'G': return Colour::Green;
-	case 'y': case 'Y': return Colour::Yellow;
+	case 'u': case 'U': return Colour::Yellow;
 	case 'b': case 'B': return Colour::Blue;
 	case 'm': case 'M': return Colour::Magenta;
 	case 'c': case 'C': return Colour::Cyan;
@@ -100,5 +100,5 @@ export auto combination_from_string(std::string_view sv) -> std::expected<combi,
 
 // Print a colour code with colours
 export void cp_print_combi(combi const c) {
-	cp_print(c[0], "* ", c[1], "* ", c[2], "* ", c[3], "* ");
+	cp_print(c[0], "*", c[1], "*", c[2], "*", c[3], "*");
 }

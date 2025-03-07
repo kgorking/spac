@@ -14,7 +14,9 @@ export enum Colour {
 	Magenta,
 	Cyan,
 	Default,
+	Black,
 	WhiteBg,
+	RedBg,
 	Max
 };
 
@@ -28,7 +30,9 @@ constexpr auto colour_codes = std::to_array({
 	"\033[95m", // magenta
 	"\033[96m", // cyan
 	"\033[0m",  // default
+	"\033[30m", // sort
 	"\033[107m", // hvid baggrund
+	"\033[101m", // hvid baggrund
 	});
 
 // Change the text colour

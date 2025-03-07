@@ -7,10 +7,10 @@ import combination;
 
 void print_help() {
 	cp_println("Mastermind!\nGæt de 4 farver i den rigtige rækkefølge.");
-	cp_print("   Tilladte farver er: ", Red, "R: rød, ", Green, "G :grøn, ", Yellow, "Y: gul, ", Blue, "B: blå, ", Magenta, "M: magenta, ", Cyan, "C: cyan\n");
+	cp_print("Farverne er RGUBMC: ", Red, "(R)ød, ", Green, "(G)røn, ", Yellow, "G(u)l, ", Blue, "(B)lå, ", Magenta, "(M)agenta, ", Cyan, "(C)yan\n");
 	cp_println(
-		"Du får en ", Red, "rød", Default, " pind for hver korrect placeret farve.\n"
-		"Du får en ", WhiteBg, "hvid", Default, " pind for hver korrekt farve der er placeret forkert.\n"
+		"Du får en ", Black, RedBg, "Rød ", Default, " pind for hver korrect farve der er placeret korrekt.\n"
+		"Du får en ", Black, WhiteBg, "Hvid", Default, " pind for hver korrekt farve der er placeret forkert.\n"
 		"Du har 12 forsøg.\n");
 }
 
@@ -59,20 +59,33 @@ int main() {
 	// Generate the colour to guess
 	auto const combo_to_guess = generate_color_combination();
 	cp_print("Gæt den hemmelige kode på 4 farver: ");
-	//cp_print_code(combo_to_guess);
+	//cp_print_combi(combo_to_guess);
+	cp_println();
 
+	// Set up guess counter and print initial guess.
+	// It is printed here for formatting reasons.
 	int num_guesses = 1;
+	cp_print(std::format("{:2}  ", num_guesses));
+
 	while (num_guesses <= 12) {
+		// Save current cursor position
+		std::print("\x1b[s");
+
+		// Read the players guess
 		std::optional<combi> const guess = read_guess();
+
+		// Restore previous cursor position and delete user input
+		std::print("\x1b[u\x1b[0K");
 
 		if (!guess)
 			continue;
 
-		// Print the number of guesses made and the entered colour code
-		cp_print(std::format("{:2}  ", num_guesses));
+		// Print the entered colour code
 		auto const& c = *guess;
 		cp_print_combi(c);
-			
+
+		cp_print("  ");
+
 		// Print the red sticks for each correct location
 		// and print the white sticks for each wrong location, but correct colour
 		auto const [locs, cols] = compare_combinations(combo_to_guess, c);
@@ -83,19 +96,26 @@ int main() {
 		if (locs + cols < 4)
 			cp_print(std::string(4 - (locs + cols), ' '));
 
-		cp_print("   ");
-		num_guesses += 1;
+		cp_println();
 
 		// Check for win-condition
 		if (4 == locs) {
 			cp_print(Colour::Green, "\nDu gættede rigtigt i ", num_guesses, " forsøg!");
 			break;
 		}
+
+		// Increase guess count after checking for win condition
+		num_guesses += 1;
+
+		// Print the number of guesses made,
+		// and clear any potential error messages
+		cp_print(std::format("{:2}  \x1b[0K", num_guesses));
 	}
 
+	// Print lose message and correct combination
 	if (num_guesses > 12) {
-		cp_println(Colour::Red, "\nDu gættede ikke den rigtige kombination i tide :(");
-		cp_print("Den korrekt kode var ");
+		cp_print(Colour::Red, "\nDu gættede ikke den rigtige kombination ");
 		cp_print_combi(combo_to_guess);
+		cp_println(Colour::Red, " i tide :(");
 	}
 }
