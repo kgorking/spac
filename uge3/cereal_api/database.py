@@ -10,34 +10,36 @@ class Database():
 
 
     def verify_table_exists(self):
+        if exists('cereals.db'):
+            return
+
         conn = self.get_connection()
-        cur = conn.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="cereals";')
-        if not cur.fetchone():
-            conn.execute("""CREATE TABLE IF NOT EXISTS
-            cereals(
-                id INTEGER PRIMARY KEY,
-                name TEXT,
-                mfr TEXT,
-                type TEXT,
-                calories INTEGER,
-                protein INTEGER,
-                fat INTEGER,
-                sodium INTEGER,
-                fiber Float,
-                carbo Float,
-                sugars INTEGER,
-                potass INTEGER,
-                vitamins INTEGER,
-                shelf INTEGER,
-                weight Float,
-                cups Float,
-                rating Float
-            )""")
+        conn.execute("""CREATE TABLE IF NOT EXISTS
+        cereals(
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            mfr TEXT,
+            type TEXT,
+            calories INTEGER,
+            protein INTEGER,
+            fat INTEGER,
+            sodium INTEGER,
+            fiber Float,
+            carbo Float,
+            sugars INTEGER,
+            potass INTEGER,
+            vitamins INTEGER,
+            shelf INTEGER,
+            weight Float,
+            cups Float,
+            rating Float
+        )""")
+        self.import_csv()
 
 
     def get_connection(self):
         if 'db' not in g:
-            g.db = sqlite3.connect('cereal.db')
+            g.db = sqlite3.connect('cereals.db')
         return g.db
 
 
