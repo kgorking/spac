@@ -1,4 +1,3 @@
-import locale
 from genericpath import exists
 from flask import g
 import sqlite3
@@ -16,6 +15,7 @@ class Database():
         if not cur.fetchone():
             conn.execute("""CREATE TABLE IF NOT EXISTS
             cereals(
+                id INTEGER PRIMARY KEY,
                 name TEXT,
                 mfr TEXT,
                 type TEXT,
@@ -53,22 +53,23 @@ class Database():
             print("Error: 'Cereal.csv' not found")
             return
 
-        # Set up locale
-        locale.setlocale(locale.LC_NUMERIC, 'da_DK.UTF-8')
-
         # Read the headers and datatypes of the csv entries
         rows = self._parse_csv("Cereal.csv")
         headers = next(rows)
         datatypes = next(rows)
 
-
         # Insert the csv data into to database
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.executemany("insert into cereals values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
+        cursor.executemany('''
+            INSERT OR IGNORE INTO
+            cereals (name,mfr,type,calories,protein,fat,sodium,fiber,carbo,sugars,potass,vitamins,shelf,weight,cups,rating)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+           rows)
+        conn.commit()
 
         # test
         cursor.execute('SELECT * FROM cereals')
-        rows = cursor.fetchall()
-        for row in rows:
+        dbrows = cursor.fetchall()
+        for row in dbrows:
             print(row)
