@@ -9,7 +9,7 @@ class Database:
         self.verify_table_exists()
 
     def verify_table_exists(self):
-        if exists("cereals.db"):
+        if exists("data/cereals.db"):
             return
 
         conn = self.get_connection()
@@ -39,7 +39,7 @@ class Database:
 
     def get_connection(self):
         if "db" not in g:
-            g.db = sqlite3.connect("cereals.db")
+            g.db = sqlite3.connect("data/cereals.db")
         return g.db
 
     def _parse_csv(self, filename):
@@ -49,7 +49,7 @@ class Database:
                 yield row
 
     def import_csv(self):
-        if not exists("Cereal.csv"):
+        if not exists("../data/Cereal.csv"):
             print("Error: 'Cereal.csv' not found")
             return
 
