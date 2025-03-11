@@ -4,17 +4,17 @@ import sqlite3
 import csv
 
 
-class Database():
+class Database:
     def __init__(self):
         self.verify_table_exists()
 
-
     def verify_table_exists(self):
-        if exists('cereals.db'):
+        if exists("cereals.db"):
             return
 
         conn = self.get_connection()
-        conn.execute("""CREATE TABLE IF NOT EXISTS
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS
         cereals(
             id INTEGER PRIMARY KEY,
             name TEXT,
@@ -33,22 +33,20 @@ class Database():
             weight Float,
             cups Float,
             rating Float
-        )""")
+        )"""
+        )
         self.import_csv()
 
-
     def get_connection(self):
-        if 'db' not in g:
-            g.db = sqlite3.connect('cereals.db')
+        if "db" not in g:
+            g.db = sqlite3.connect("cereals.db")
         return g.db
 
-
     def _parse_csv(self, filename):
-        with open(filename, newline='\n') as csvfile:
-            reader = csv.reader(csvfile, delimiter=';')
+        with open(filename, newline="\n") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";")
             for row in reader:
                 yield row
-
 
     def import_csv(self):
         if not exists("Cereal.csv"):
@@ -63,15 +61,17 @@ class Database():
         # Insert the csv data into to database
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.executemany('''
+        cursor.executemany(
+            """
             INSERT OR IGNORE INTO
             cereals (name,mfr,type,calories,protein,fat,sodium,fiber,carbo,sugars,potass,vitamins,shelf,weight,cups,rating)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-           rows)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            rows,
+        )
         conn.commit()
 
         # test
-        cursor.execute('SELECT * FROM cereals')
+        cursor.execute("SELECT * FROM cereals")
         dbrows = cursor.fetchall()
         for row in dbrows:
             print(row)
