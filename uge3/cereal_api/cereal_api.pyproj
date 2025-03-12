@@ -24,9 +24,14 @@
   <ItemGroup>
     <Compile Include="src\cereal_api.py" />
     <Compile Include="src\database.py" />
+    <Compile Include="tests\create_cereal.py" />
+    <Compile Include="tests\delete_cereal.py" />
+    <Compile Include="tests\list_all_cereals.py" />
+    <Compile Include="tests\update_cereal.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\" />
+    <Folder Include="tests\" />
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>

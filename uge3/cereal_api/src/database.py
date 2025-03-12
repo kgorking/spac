@@ -2,6 +2,7 @@ from genericpath import exists
 from flask import g, jsonify, request
 import sqlite3
 import csv
+import json
 
 
 class Database:
@@ -10,15 +11,38 @@ class Database:
 
     def get_all_cereal(self):
         with self.get_connection() as conn:
-            cur = conn.execute("SELECT * from cereals")
+            cur = conn.execute("SELECT * FROM cereals")
             rows = cur.fetchall()
             return rows if rows is not None else []
 
     def get_cereal(self, id: int):
         with self.get_connection() as conn:
-            cur = conn.execute("SELECT * from cereals where id=?", (id,))
+            cur = conn.execute("SELECT * FROM cereals where id=?", (id,))
             row = cur.fetchone()
             return row if row is not None else []
+
+    def delete_cereal(self, id: int):
+        with self.get_connection() as conn:
+            cur = conn.execute("DELETE FROM cereals where id=?", (id,))
+            conn.commit()
+            return {'deleted': cur.rowcount}
+
+    def insert_or_update(self, json_data):
+        if "id" in json_data:
+            list = [f"{k} = '{json_data[k]}'" for k in json_data.keys()]
+            updates = ",".join(list)
+            sql = f"UPDATE cereals SET {updates} WHERE id={json_data['id']}"
+            print(sql)
+            with self.get_connection() as conn:
+                cursor = conn.execute(sql, json_data)
+                return {"updated": cursor.rowcount}
+        else:
+            names = ",".join(json_data.keys())
+            values = ",:".join(json_data.keys())
+            sql = f"INSERT INTO cereals ({names}) VALUES (:{values})"
+            with self.get_connection() as conn:
+                cursor = conn.execute(sql, json_data)
+                return {"id": cursor.lastrowid}
 
     def verify_table_exists(self):
         if exists("data/cereals.db"):
@@ -48,7 +72,6 @@ class Database:
         )
         self._import_csv()
 
-
     def get_connection(self):
         if "db" not in g:
             g.db = sqlite3.connect("data/cereals.db")
@@ -74,13 +97,13 @@ class Database:
             datatypes = next(rows)
 
             # Insert the csv data into to database
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.executemany(
-                """
-                INSERT INTO
-                cereals (name,mfr,type,calories,protein,fat,sodium,fiber,carbo,sugars,potass,vitamins,shelf,weight,cups,rating)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                rows,
-            )
-            conn.commit()
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.executemany(
+                    """
+                    INSERT INTO
+                    cereals (name,mfr,type,calories,protein,fat,sodium,fiber,carbo,sugars,potass,vitamins,shelf,weight,cups,rating)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    rows,
+                )
+                conn.commit()

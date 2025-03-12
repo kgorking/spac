@@ -1,7 +1,8 @@
 from genericpath import exists
 from flask import Flask, g, request
-import sqlite3
 from database import Database
+import sqlite3
+import json
 
 # Set up the app
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def close_db(exception):
 
 @app.route("/")
 def index():
-    return "/cereal"
+    return "Det sjove sker i '/cereal'"
 
 
 @app.route("/cereal/<int:id>")
@@ -28,24 +29,16 @@ def get_cereal_by_id(id: int):
     return db.get_cereal(id)
 
 
-@app.route("/cereal")
+@app.route("/cereal", methods = ['GET', 'POST', 'PUT', 'DELETE'])
 def get_cereals():
-    return db.get_all_cereal()
-
-
-@app.route("/create", methods=["POST"])
-def create():
-    pass
-
-
-@app.route("/delete", methods=["DELETE"])
-def delete():
-    pass
-
-
-@app.route("/update", methods=["PUT"])
-def update():
-    pass
+    if request.method == 'GET':
+        return db.get_all_cereal()
+    elif request.method == 'DELETE':
+        cereal = json.loads(request.data)
+        return db.delete_cereal(cereal['id'])
+    else:
+        cereal = json.loads(request.data)
+        return db.insert_or_update(cereal)
 
 
 if __name__ == "__main__":
