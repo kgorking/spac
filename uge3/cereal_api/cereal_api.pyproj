@@ -33,6 +33,7 @@
     <Compile Include="tests\list_all_cereals.py" />
     <Compile Include="tests\list_all_filter.py" />
     <Compile Include="tests\list_one_cereal.py" />
+    <Compile Include="tests\login.py" />
     <Compile Include="tests\update_cereal.py" />
   </ItemGroup>
   <ItemGroup>
