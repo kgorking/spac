@@ -2,9 +2,9 @@ import json
 from flask import jsonify, request
 from flask_restful import Api, Resource
 from flask_login import login_user, logout_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
-import sqlalchemy
+from werkzeug.security import check_password_hash
 from models import db, Cereal, User
+
 
 class CerealAPI(Resource):
     def get(self, id: int):
@@ -18,13 +18,10 @@ class CerealAPI(Resource):
 class UpdateCerealAPI(Resource):
     @login_required
     def post(self):
-        try:
-            data = json.loads(request.data)
-            num_rows_updated = Cereal.query.filter_by(name=data['name']).update(data)
-            db.session.commit()
-            return {'num_rows_updated': num_rows_updated}, 201
-        except sqlalchemy.exc.IntegrityError as e:
-            return {"error": str(e)}, 400
+        data = json.loads(request.data)
+        num_rows_updated = Cereal.query.filter_by(name=data["name"]).update(data)
+        db.session.commit()
+        return {"num_rows_updated": num_rows_updated}, 201
 
 
 class ListCerealAPI(Resource):

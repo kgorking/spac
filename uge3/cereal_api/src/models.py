@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
 # Set up SQL Alchemy
-db: SQLAlchemy = SQLAlchemy()
+db = SQLAlchemy()
 
 @dataclass
 class Cereal(db.Model):

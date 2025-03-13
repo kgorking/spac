@@ -1,8 +1,4 @@
-from flask import Flask, jsonify
-from requests import Session
-from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource
-from flask_login import LoginManager, current_user
+from flask import Flask
 from csv_importer import import_csv
 from werkzeug.security import generate_password_hash
 
@@ -10,8 +6,6 @@ app = Flask(__name__)
 app.instance_path = "data"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cereals.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_TYPE"] = "filesystem"
 app.config["SECRET_KEY"] = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
 app.secret_key = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
 

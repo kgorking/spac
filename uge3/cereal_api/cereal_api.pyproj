@@ -27,7 +27,6 @@
     <Compile Include="src\auth.py" />
     <Compile Include="src\csv_importer.py" />
     <Compile Include="src\models.py" />
-    <Compile Include="src\user_api.py" />
     <Compile Include="tests\create_cereal.py" />
     <Compile Include="tests\delete_cereal.py" />
     <Compile Include="tests\list_all_cereals.py" />
