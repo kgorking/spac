@@ -1,9 +1,8 @@
 import requests
 
-url = 'http://localhost:81/cereal'
-data = {'id': 78}
+url = 'http://localhost:81/cereal/delete/78'
 
-response = requests.delete(url, json=data)
+response = requests.delete(url)
 
 print(response.status_code)
 print(response.json())

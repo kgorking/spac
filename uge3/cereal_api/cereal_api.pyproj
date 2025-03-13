@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ac457a74-442a-4411-80fd-f667b0145a10</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>src\cereal_api.py</StartupFile>
+    <StartupFile>src\app.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,11 +22,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\cereal_api.py" />
-    <Compile Include="src\database.py" />
+    <Compile Include="src\api.py" />
+    <Compile Include="src\app.py" />
+    <Compile Include="src\auth.py" />
+    <Compile Include="src\csv_importer.py" />
+    <Compile Include="src\models.py" />
+    <Compile Include="src\user_api.py" />
     <Compile Include="tests\create_cereal.py" />
     <Compile Include="tests\delete_cereal.py" />
     <Compile Include="tests\list_all_cereals.py" />
+    <Compile Include="tests\list_all_filter.py" />
+    <Compile Include="tests\list_one_cereal.py" />
     <Compile Include="tests\update_cereal.py" />
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\Cereal.csv" />
+    <Content Include="data\cereals.db" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>
