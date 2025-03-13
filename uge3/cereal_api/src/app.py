@@ -1,17 +1,23 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
+from requests import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from csv_importer import import_csv
 from werkzeug.security import generate_password_hash
-from flask_jwt import JWT, jwt_required, current_identity
 
 app = Flask(__name__)
 app.instance_path = "data"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cereals.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "Nyre-spark"
-app.secret = "Nyre-spark"
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SECRET_KEY"] = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
+app.secret_key = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
+
+# Init Auth
+from auth import login_manager
+login_manager.init_app(app)
 
 # Init API
 from api import api
@@ -20,11 +26,6 @@ api.init_app(app)
 # Init database
 from models import db, Cereal, User
 db.init_app(app)
-
-# Init Auth
-import auth
-jwt = JWT(app, auth.authenticate, auth.identity)
-
 
 
 if __name__ == "__main__":
@@ -43,7 +44,6 @@ if __name__ == "__main__":
             user = User(name='user', password=hashed_pw, email='user@password.com')
             db.session.add(user)
             db.session.commit()
-            print("Added default user 'user' with password 'password'")
 
     # Start the server
     app.run(debug=True, host="0.0.0.0", port=81)

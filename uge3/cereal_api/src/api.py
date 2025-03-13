@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy
 from models import db, Cereal, User
 
-
 class CerealAPI(Resource):
     def get(self, id: int):
         cereal = Cereal.query.get(id)
@@ -15,14 +14,15 @@ class CerealAPI(Resource):
         else:
             return {"message": f"Cereal with id {id} not found"}, 404
 
+
+class UpdateCerealAPI(Resource):
     @login_required
     def post(self):
-        data = json.loads(request.data)
-        new_cereal = Cereal(**data)
-        db.session.add(new_cereal)
         try:
+            data = json.loads(request.data)
+            num_rows_updated = Cereal.query.filter_by(name=data['name']).update(data)
             db.session.commit()
-            return {"id": new_cereal.id}, 201
+            return {'num_rows_updated': num_rows_updated}, 201
         except sqlalchemy.exc.IntegrityError as e:
             return {"error": str(e)}, 400
 
@@ -48,12 +48,14 @@ class DeleteCerealAPI(Resource):
             return {"message": f"invalid id {id}"}, 400
 
 
-class AuthAPI(Resource):
+class LogoutAPI(Resource):
     @login_required
     def get(self):
         logout_user()
         return "logged out", 200
 
+
+class LoginAPI(Resource):
     def post(self):
         email = request.form["email"]
         password = request.form["password"]
@@ -70,6 +72,8 @@ class AuthAPI(Resource):
 # Set up api routes
 api = Api()
 api.add_resource(ListCerealAPI, "/cereal")
+api.add_resource(UpdateCerealAPI, "/cereal/update")
 api.add_resource(CerealAPI, "/cereal/create", "/cereal/<int:id>")
 api.add_resource(DeleteCerealAPI, "/cereal/delete/<int:id>")
-api.add_resource(AuthAPI, "/login", "/logout")
+api.add_resource(LogoutAPI, "/logout")
+api.add_resource(LoginAPI, "/login")

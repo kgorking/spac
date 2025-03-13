@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
 # Set up SQL Alchemy
-db = SQLAlchemy()
+db: SQLAlchemy = SQLAlchemy()
 
 @dataclass
 class Cereal(db.Model):
@@ -32,3 +32,6 @@ class User(db.Model, UserMixin):
     name     : str = db.Column(db.String(64), unique=True, nullable=False)
     email    : str = db.Column(db.String(120), unique=True, nullable=False)
     password : str = db.Column(db.String(60), nullable=False)
+
+    def is_authenticated(self):
+        return True
