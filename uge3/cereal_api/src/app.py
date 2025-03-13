@@ -4,6 +4,7 @@ from flask_restful import Api, Resource
 from csv_importer import import_csv
 
 app = Flask(__name__)
+app.instance_path = 'data'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cereals.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SECRET_KEY'] = "Nyre-spark"
