@@ -16,6 +16,9 @@ import list_all_cereals
 print("  getting cereals with filter")
 import list_all_filter
 
+print("  getting cereals sorted")
+import list_all_sorted
+
 print("  getting one cereal")
 import list_one_cereal
 

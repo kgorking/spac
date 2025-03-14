@@ -2,7 +2,7 @@ from genericpath import exists
 from os import remove
 import requests
 
-url = 'http://localhost:81/image/13'
+url = 'http://localhost:81/api/image/13'
 response = requests.get(url)
 assert(response.status_code == 200)
 

@@ -112,10 +112,10 @@ class LoginAPI(Resource):
 
 # Set up api routes
 api = Api()
-api.add_resource(ListCerealAPI, "/cereal")
-api.add_resource(UpdateCerealAPI, "/cereal/update")
-api.add_resource(CerealAPI, "/cereal/create", "/cereal/<int:id>")
-api.add_resource(DeleteCerealAPI, "/cereal/delete/<int:id>")
-api.add_resource(ImageAPI, "/image/<int:id>")
-api.add_resource(LogoutAPI, "/logout")
-api.add_resource(LoginAPI, "/login")
+api.add_resource(ListCerealAPI, "/api/cereal")
+api.add_resource(UpdateCerealAPI, "/api/cereal/update")
+api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>")
+api.add_resource(DeleteCerealAPI, "/api/cereal/delete/<int:id>")
+api.add_resource(ImageAPI, "/api/image/<int:id>")
+api.add_resource(LogoutAPI, "/api/logout")
+api.add_resource(LoginAPI, "/api/login")
