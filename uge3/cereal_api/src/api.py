@@ -39,7 +39,17 @@ class UpdateCerealAPI(Resource):
 class ListCerealAPI(Resource):
     def get(self):
         if request.args:
-            return jsonify(Cereal.query.filter_by(**request.args).all())
+            args = request.args.to_dict()
+            sort = args.get('sort', None)
+            if sort:
+                args.pop('sort')
+
+            q = Cereal.query.filter_by(**args)
+
+            if sort:
+                q = q.order_by(getattr(Cereal, sort))
+
+            return jsonify(q.all())
         else:
             cereals = Cereal.query.all()
             return jsonify(cereals)
