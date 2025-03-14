@@ -7,6 +7,33 @@ from werkzeug.security import check_password_hash
 from models import db, Cereal, User
 
 
+class ListCerealAPI(Resource):
+    def get(self):
+        q = Cereal.query
+
+        if request.args:
+            # Convert to a dict I can modify
+            args = request.args.to_dict()
+
+            # Check for 'sort' argument, and remove it if found
+            sort = args.get('sort', None)
+            if sort:
+                args.pop('sort')
+
+            # Apply the filters
+            q = q.filter_by(**args)
+
+            # Apply optional column sorting
+            if sort:
+                attr = getattr(Cereal, sort, None)
+                if not attr:
+                    return f"Unknown sort param '{sort}'", 400
+                q = q.order_by(attr)
+
+        # Run the query and return it as json
+        return jsonify(q.all())
+
+
 class CerealAPI(Resource):
     def get(self, id: int):
         cereal = Cereal.query.get(id)
@@ -44,33 +71,6 @@ class CerealAPI(Resource):
             return {"message": f"invalid id {id}"}, 400
 
 
-class ListCerealAPI(Resource):
-    def get(self):
-        if request.args:
-            # Convert to a dict I can modify
-            args = request.args.to_dict()
-
-            # Check for 'sort' argument, and remove it if found
-            sort = args.get('sort', None)
-            if sort:
-                args.pop('sort')
-
-            # Apply the filters
-            q = Cereal.query.filter_by(**args)
-
-            # Apply optional column sorting
-            if sort:
-                attr = getattr(Cereal, sort, None)
-                if not attr:
-                    return f"Unknown sort param '{sort}'", 400
-                q = q.order_by(attr)
-
-            return jsonify(q.all())
-        else:
-            cereals = Cereal.query.all()
-            return jsonify(cereals)
-
-
 class ImageAPI(Resource):
     def get(self, id: int):
         cereal = Cereal.query.get(id)
@@ -106,7 +106,7 @@ class AuthAPI(Resource):
 
 # Set up api routes
 api = Api()
-api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>", "/api/cereal/delete/<int:id>", "/api/cereal/update")
 api.add_resource(ListCerealAPI, "/api/cereal")
-api.add_resource(AuthAPI, "/api/logout", "/api/login")
+api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>", "/api/cereal/delete/<int:id>", "/api/cereal/update")
 api.add_resource(ImageAPI, "/api/image/<int:id>")
+api.add_resource(AuthAPI, "/api/logout", "/api/login")

@@ -29,27 +29,30 @@ http://localhost:81/api/cereal/2
 }
 ```
 
-`/api/cereal`: Hent alle morgenmadsprodukter som en liste af dictionaries
+`/api/cereal`: Hent alle morgenmadsprodukter som en liste af dictionaries. Kan filtreres og sorteres.
 
 `/api/cereal/create`: Opret en ny morgenmad. `name` og `mfr` er påkrævet.
 
 `/api/cereal/update`: Opdater en eksisterende morgenmad.
 
-`/api/cereal/delete/<id>`: Deletes an existing cereal
+`/api/cereal/delete/<id>`: Slet en morgenmad.
 
-`/api/cereal/login`: Log in with username and password. A default user 'user' exists with password 'password'
+`/api/cereal/login`: Log in med navn og kode. En standard bruger 'user' er oprettet med koden 'password'
 
-`/api/cereal/logout`: Logs out the user
+`/api/cereal/logout`: Log brugeren ud
 
-`/api/image/<id>`: Returns the image of the cereal id
+`/api/image/<id>`: Hent et billede til den angivne morgenmad
 
-## Filtering
-Use url arguments to filter on certain key-value pairs. You can specify multiple filters.
+### Filter
+`api/cereal?calories=50` returnerer alle morgenmadsprodukter der indeholder 50 kalorier.
 
-`api/cereal?calories=50` will return all cereals that have 50 calories.
+### Sortering
+Brug `sort` argumentet til at sortere på en nøgle.
 
-## Sorting
-Use the url argument `sort` to sort on a certain key.
+`api/cereal?sort=fat` returnerer alle morgenmadsprodukter sorteret efter deres fedtindhold.
 
-`api/cereal?sort=fat` will return all cereals sorted by their fat content.
 
+# Test
+Kør `tests/test_all_endpoints.py` for at test alle endpoints.
+
+# Design
