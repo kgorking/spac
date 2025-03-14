@@ -16,14 +16,14 @@ class ListCerealAPI(Resource):
             args = request.args.to_dict()
 
             # Check for 'sort' argument, and remove it if found
-            sort = args.get('sort', None)
+            sort = args.get("sort", None)
             if sort:
-                args.pop('sort')
+                args.pop("sort")
 
             # Check for 'select' argument, and remove it if found
-            select = args.get('select', None)
+            select = args.get("select", None)
             if select:
-                args.pop('select')
+                args.pop("select")
 
             # Apply the filters
             q = q.filter_by(**args)
@@ -35,12 +35,12 @@ class ListCerealAPI(Resource):
                     return f"Unknown sort param '{sort}'", 400
                 q = q.order_by(attr)
 
-
             # Apply optional select
             if select:
-                attr = [getattr(Cereal, s, None) for s in select.split(',')]
+                attr = [getattr(Cereal, s, None) for s in select.split(",")]
                 q = q.with_entities(*attr)
-                return [row._asdict() for row in q.all()] # no 'dataclass' exists for this row, so unroll it manually
+                # no 'dataclass' exists for this row, so unroll it manually
+                return [row._asdict() for row in q.all()]
 
         # Run the query and return it as json
         return jsonify(q.all())
@@ -59,11 +59,8 @@ class CerealAPI(Resource):
         data = json.loads(request.data)
         new_cereal = Cereal(**data)
         db.session.add(new_cereal)
-        try:
-            db.session.commit()
-            return {"id": new_cereal.id}, 201
-        except:
-            return {"error": "exception"}, 400
+        db.session.commit()
+        return {"id": new_cereal.id}, 201
 
     @login_required
     def patch(self):
@@ -88,9 +85,9 @@ class ImageAPI(Resource):
         cereal = Cereal.query.get(id)
         if cereal:
             # weird path descrepancy
-            img = f'data/img/{cereal.name}.jpg'
+            img = f"data/img/{cereal.name}.jpg"
             if exists(img):
-                return send_file('../' + img, mimetype='image/jpeg')
+                return send_file("../" + img, mimetype="image/jpeg")
             else:
                 return "file not found", 400
         else:
@@ -119,6 +116,12 @@ class AuthAPI(Resource):
 # Set up api routes
 api = Api()
 api.add_resource(ListCerealAPI, "/api/cereal")
-api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>", "/api/cereal/delete/<int:id>", "/api/cereal/update")
+api.add_resource(
+    CerealAPI,
+    "/api/cereal/create",
+    "/api/cereal/<int:id>",
+    "/api/cereal/delete/<int:id>",
+    "/api/cereal/update",
+)
 api.add_resource(ImageAPI, "/api/image/<int:id>")
 api.add_resource(AuthAPI, "/api/logout", "/api/login")
