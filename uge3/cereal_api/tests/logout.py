@@ -8,4 +8,3 @@ assert(200 == response.status_code)
 url = 'http://localhost:81/logout'
 response = requests.get(url, cookies=response.cookies)
 assert(200 == response.status_code)
-print("ok")

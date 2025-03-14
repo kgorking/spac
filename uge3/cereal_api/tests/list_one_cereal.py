@@ -1,10 +1,7 @@
 import requests
-import json
 
 url = 'http://localhost:81/cereal/13'
-
 response = requests.get(url)
 
-print(response.status_code)
-print(response.text)
-#print(response.json())
+assert(200 == response.status_code)
+assert(17 == len(response.json())) # holds each column

@@ -29,15 +29,17 @@ if __name__ == "__main__":
 
         # Import .csv data if db is empty
         if 0 == len(Cereal.query.all()):
+            print("Importing .csv file...")
             import_csv("data/cereal.csv")
 
         # Add default user if needed
         user = db.session.get(User, 1)
         if not user:
+            print("Creating default user 'user' with password 'password'...")
             hashed_pw = generate_password_hash('password')
             user = User(name='user', password=hashed_pw, email='user@password.com')
             db.session.add(user)
             db.session.commit()
 
     # Start the server
-    app.run(debug=True, host="0.0.0.0", port=81)
+    app.run(debug=False, host="0.0.0.0", port=81)

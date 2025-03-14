@@ -31,9 +31,9 @@ class UpdateCerealAPI(Resource):
     @login_required
     def post(self):
         data = json.loads(request.data)
-        num_rows_updated = Cereal.query.filter_by(name=data["name"]).update(data)
+        num_rows_updated = Cereal.query.filter_by(id=data["id"]).update(data)
         db.session.commit()
-        return {"num_rows_updated": num_rows_updated}, 201
+        return {"num_rows_updated": num_rows_updated}, 200
 
 
 class ListCerealAPI(Resource):
@@ -61,7 +61,7 @@ class ImageAPI(Resource):
     def get(self, id: int):
         cereal = Cereal.query.get(id)
         if cereal:
-            # weird path descrepency
+            # weird path descrepancy
             img = f'data/img/{cereal.name}.jpg'
             if exists(img):
                 return send_file('../' + img, mimetype='image/jpeg')
