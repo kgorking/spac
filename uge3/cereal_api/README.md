@@ -5,7 +5,9 @@ Implementation af et API der behandler morgenmadsprodukter.
 Start serveren med kommandoen `py src/app.py`
 
 ## Test
-Kør `tests/test_all_endpoints.py` for at teste alle endpoints.
+Kør `pip install -r requirements.txt` for at installere alle afhængighederne.
+
+Kør `py tests/test_all_endpoints.py` for at teste alle endpoints.
 
 ## Endpoints
 `/api/cereal/<id>`: Hent morgenmad med `id` som et dictionary.
