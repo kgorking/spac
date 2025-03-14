@@ -26,14 +26,22 @@ class CerealAPI(Resource):
         except:
             return {"error": "exception"}, 400
 
-
-class UpdateCerealAPI(Resource):
     @login_required
-    def post(self):
+    def patch(self):
         data = json.loads(request.data)
         num_rows_updated = Cereal.query.filter_by(id=data["id"]).update(data)
         db.session.commit()
         return {"num_rows_updated": num_rows_updated}, 200
+
+    @login_required
+    def delete(self, id: int):
+        cereal = Cereal.query.get(id)
+        if cereal:
+            db.session.delete(cereal)
+            db.session.commit()
+            return {"message": f"cereal {id} deleted"}, 200
+        else:
+            return {"message": f"invalid id {id}"}, 400
 
 
 class ListCerealAPI(Resource):
@@ -63,18 +71,6 @@ class ListCerealAPI(Resource):
             return jsonify(cereals)
 
 
-class DeleteCerealAPI(Resource):
-    @login_required
-    def delete(self, id: int):
-        cereal = Cereal.query.get(id)
-        if cereal:
-            db.session.delete(cereal)
-            db.session.commit()
-            return {"message": f"cereal {id} deleted"}, 200
-        else:
-            return {"message": f"invalid id {id}"}, 400
-
-
 class ImageAPI(Resource):
     def get(self, id: int):
         cereal = Cereal.query.get(id)
@@ -89,14 +85,12 @@ class ImageAPI(Resource):
             return "invalid id", 400
 
 
-class LogoutAPI(Resource):
+class AuthAPI(Resource):
     @login_required
     def get(self):
         logout_user()
         return "logged out", 200
 
-
-class LoginAPI(Resource):
     def post(self):
         email = request.form["email"]
         password = request.form["password"]
@@ -112,10 +106,7 @@ class LoginAPI(Resource):
 
 # Set up api routes
 api = Api()
+api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>", "/api/cereal/delete/<int:id>", "/api/cereal/update")
 api.add_resource(ListCerealAPI, "/api/cereal")
-api.add_resource(UpdateCerealAPI, "/api/cereal/update")
-api.add_resource(CerealAPI, "/api/cereal/create", "/api/cereal/<int:id>")
-api.add_resource(DeleteCerealAPI, "/api/cereal/delete/<int:id>")
+api.add_resource(AuthAPI, "/api/logout", "/api/login")
 api.add_resource(ImageAPI, "/api/image/<int:id>")
-api.add_resource(LogoutAPI, "/api/logout")
-api.add_resource(LoginAPI, "/api/login")

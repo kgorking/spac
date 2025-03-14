@@ -7,7 +7,7 @@ assert(200 == login_response.status_code)
 
 url = 'http://localhost:81/api/cereal/update'
 data = {'id': 78, 'name': 'Test cereal 3'}
-response = requests.post(url, json=data, cookies=login_response.cookies)
+response = requests.patch(url, json=data, cookies=login_response.cookies)
 assert(200 == response.status_code)
 assert(1 == response.json()['num_rows_updated'])
 
