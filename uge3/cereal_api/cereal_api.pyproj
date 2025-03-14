@@ -29,6 +29,7 @@
     <Compile Include="src\models.py" />
     <Compile Include="tests\create_cereal.py" />
     <Compile Include="tests\delete_cereal.py" />
+    <Compile Include="tests\get_cereal_image.py" />
     <Compile Include="tests\list_all_cereals.py" />
     <Compile Include="tests\list_all_filter.py" />
     <Compile Include="tests\list_one_cereal.py" />

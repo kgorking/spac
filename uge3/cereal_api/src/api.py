@@ -1,5 +1,6 @@
+from genericpath import exists
 import json
-from flask import jsonify, request
+from flask import jsonify, make_response, request, send_file
 from flask_restful import Api, Resource
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import check_password_hash
@@ -45,6 +46,20 @@ class DeleteCerealAPI(Resource):
             return {"message": f"invalid id {id}"}, 400
 
 
+class ImageAPI(Resource):
+    def get(self, id: int):
+        cereal = Cereal.query.get(id)
+        if cereal:
+            # weird path descrepency
+            img = f'data/img/{cereal.name}.jpg'
+            if exists(img):
+                return send_file('../' + img, mimetype='image/jpeg')
+            else:
+                return "file not found", 400
+        else:
+            return "invalid id", 400
+
+
 class LogoutAPI(Resource):
     @login_required
     def get(self):
@@ -72,5 +87,6 @@ api.add_resource(ListCerealAPI, "/cereal")
 api.add_resource(UpdateCerealAPI, "/cereal/update")
 api.add_resource(CerealAPI, "/cereal/create", "/cereal/<int:id>")
 api.add_resource(DeleteCerealAPI, "/cereal/delete/<int:id>")
+api.add_resource(ImageAPI, "/image/<int:id>")
 api.add_resource(LogoutAPI, "/logout")
 api.add_resource(LoginAPI, "/login")
