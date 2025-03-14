@@ -15,6 +15,17 @@ class CerealAPI(Resource):
         else:
             return {"message": f"Cereal with id {id} not found"}, 404
 
+    @login_required
+    def post(self):
+        data = json.loads(request.data)
+        new_cereal = Cereal(**data)
+        db.session.add(new_cereal)
+        try:
+            db.session.commit()
+            return {"id": new_cereal.id}, 201
+        except:
+            return {"error": "exception"}, 400
+
 
 class UpdateCerealAPI(Resource):
     @login_required
