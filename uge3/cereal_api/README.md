@@ -1,13 +1,14 @@
-# Cereal API
+ï»¿# Cereal API
 Implementation af et API der behandler morgenmadsprodukter.
 
-## Kørsel
+## OpsÃ¦tning
+KÃ¸r `pip install -r requirements.txt` for at installere alle afhÃ¦ngighederne.
+
+## KÃ¸rsel
 Start serveren med kommandoen `py src/app.py`
 
 ## Test
-Kør `pip install -r requirements.txt` for at installere alle afhængighederne.
-
-Kør `py tests/test_all_endpoints.py` for at teste alle endpoints.
+KÃ¸r `py tests/test_all_endpoints.py` for at teste alle endpoints.
 
 ## Endpoints
 `/api/cereal/<id>`: Hent morgenmad med `id` som et dictionary.
@@ -39,11 +40,12 @@ http://localhost:81/api/cereal/2
 
 `/api/cereal`: Hent alle morgenmadsprodukter som en liste af dictionaries. Kan filtreres, selectes, og sorteres.
 
-* Filter: `/api/cereal?calories=50` returnerer alle morgenmadsprodukter der indeholder 50 kalorier.
-* Select: `/api/cereal?select=name,fiber` brug `select` argumentet til at kun returnere specifikke kolonner.
-* Sorter: `/api/cereal?sort=name` brug `sort` argumentet til at sortere på en nøgle.
+* Filter: `/api/cereal?calories=50` returner alle morgenmadsprodukter der indeholder 50 kalorier.
+* Select: `/api/cereal?select=name,fiber` returner kun 'name' og 'fiber' kolonnerne.
+* Sorter: `/api/cereal?sort=name` sorter pÃ¥ en nÃ¸gle.
+* Kan kombineres: `/api/cereal?select=name,calories&sort=calories`
 
-`/api/cereal/create`: Opret en ny morgenmad. `name` og `mfr` er påkrævet.
+`/api/cereal/create`: Opret en ny morgenmad. `name` og `mfr` er pÃ¥krÃ¦vet.
 
 `/api/cereal/update`: Opdater en eksisterende morgenmad.
 
@@ -60,9 +62,10 @@ http://localhost:81/api/cereal/2
 
 # Design
 Lavet med:
-* Flask, til opsætning af http server
-* Flask RESTful, til opsætning af endpoints
-* Flask Login, til at håndtere autentifikation
-* SQLAlchemy, til at håndtere data tiil/fra databasen
+* Flask, til opsÃ¦tning af http server
+* Flask RESTful, til opsÃ¦tning af endpoints
+* Flask Login, til at hÃ¥ndtere autentifikation
+* SQLAlchemy, til at hÃ¥ndtere data til/fra databasen
 
 ## Begrundelse for design
+Teknologier er valgt fordi, at det var dem jeg kunne fÃ¥ til at virke ğŸ‘.
