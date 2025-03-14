@@ -4,7 +4,8 @@
 
 *.vs*
 *x64*
-__pycache__/*
+*__pycache__*
 /uge3/cereal_api/src/__pycache__/database.cpython-313.pyc
 /.vs/VSWorkspaceState.json
 /uge3/cereal_api/src/__pycache__
+/uge3/cereal_api/data/cereals.db
