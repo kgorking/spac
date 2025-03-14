@@ -20,6 +20,11 @@ class ListCerealAPI(Resource):
             if sort:
                 args.pop('sort')
 
+            # Check for 'select' argument, and remove it if found
+            select = args.get('select', None)
+            if select:
+                args.pop('select')
+
             # Apply the filters
             q = q.filter_by(**args)
 
@@ -29,6 +34,13 @@ class ListCerealAPI(Resource):
                 if not attr:
                     return f"Unknown sort param '{sort}'", 400
                 q = q.order_by(attr)
+
+
+            # Apply optional select
+            if select:
+                attr = [getattr(Cereal, s, None) for s in select.split(',')]
+                q = q.with_entities(*attr)
+                return [row._asdict() for row in q.all()] # no 'dataclass' exists for this row, so unroll it manually
 
         # Run the query and return it as json
         return jsonify(q.all())

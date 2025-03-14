@@ -37,7 +37,11 @@ http://localhost:81/api/cereal/2
 }
 ```
 
-`/api/cereal`: Hent alle morgenmadsprodukter som en liste af dictionaries. Kan filtreres og sorteres.
+`/api/cereal`: Hent alle morgenmadsprodukter som en liste af dictionaries. Kan filtreres, selectes, og sorteres.
+
+* Filter: `/api/cereal?calories=50` returnerer alle morgenmadsprodukter der indeholder 50 kalorier.
+* Select: `/api/cereal?select=name,fiber` brug `select` argumentet til at kun returnere specifikke kolonner.
+* Sorter: `/api/cereal?sort=name` brug `sort` argumentet til at sortere på en nøgle.
 
 `/api/cereal/create`: Opret en ny morgenmad. `name` og `mfr` er påkrævet.
 
@@ -51,12 +55,6 @@ http://localhost:81/api/cereal/2
 
 `/api/image/<id>`: Hent et billede til den angivne morgenmad
 
-### Filter
-`api/cereal?calories=50` returnerer alle morgenmadsprodukter der indeholder 50 kalorier.
-
-### Sortering
-Brug `sort` argumentet til at sortere på en nøgle.
-
 `api/cereal?sort=fat` returnerer alle morgenmadsprodukter sorteret efter deres fedtindhold.
 
 
@@ -66,3 +64,5 @@ Lavet med:
 * Flask RESTful, til opsætning af endpoints
 * Flask Login, til at håndtere autentifikation
 * SQLAlchemy, til at håndtere data tiil/fra databasen
+
+## Begrundelse for design
