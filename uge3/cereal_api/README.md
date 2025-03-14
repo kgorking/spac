@@ -67,3 +67,9 @@ Lavet med:
 
 ## Begrundelse for design
 Teknologier er valgt fordi, at det var dem jeg kunne få til at virke 👍.
+
+## TODO
+* Brug `Flask-Limiter` til rate limiting: https://flask-limiter.readthedocs.io/en/stable/
+* HTTPS
+* Intervalbaserede søgninger (f.eks. `/api/cereal?calories>=100&calories<=200`)
+	* Eller `/api/cereal?calories=(100..200)`
