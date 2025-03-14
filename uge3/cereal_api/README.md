@@ -1,6 +1,12 @@
 # Cereal API
 Implementation af et API der behandler morgenmadsprodukter.
 
+## Kørsel
+Start serveren med kommandoen `py app.py`
+
+## Test
+Kør `tests/test_all_endpoints.py` for at teste alle endpoints.
+
 ## Endpoints
 `/api/cereal/<id>`: Hent morgenmad med `id` som et dictionary.
 ```
@@ -52,7 +58,9 @@ Brug `sort` argumentet til at sortere på en nøgle.
 `api/cereal?sort=fat` returnerer alle morgenmadsprodukter sorteret efter deres fedtindhold.
 
 
-# Test
-Kør `tests/test_all_endpoints.py` for at test alle endpoints.
-
 # Design
+Lavet med:
+* Flask, til opsætning af http server
+* Flask RESTful, til opsætning af endpoints
+* Flask Login, til at håndtere autentifikation
+* SQLAlchemy, til at håndtere data tiil/fra databasen
