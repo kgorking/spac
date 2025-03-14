@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\Cereal.csv" />
-    <Content Include="data\cereals.db" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>

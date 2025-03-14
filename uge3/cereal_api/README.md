@@ -2,7 +2,7 @@
 Implementation af et API der behandler morgenmadsprodukter.
 
 ## Kørsel
-Start serveren med kommandoen `py app.py`
+Start serveren med kommandoen `py src/app.py`
 
 ## Test
 Kør `tests/test_all_endpoints.py` for at teste alle endpoints.
