@@ -1,6 +1,6 @@
-from genericpath import exists
+import genericpath
 import json
-from flask import jsonify, make_response, request, send_file
+from flask import jsonify, request, send_file
 from flask_restful import Api, Resource
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import check_password_hash
@@ -15,15 +15,9 @@ class ListCerealAPI(Resource):
             # Convert to a dict I can modify
             args = request.args.to_dict()
 
-            # Check for 'sort' argument, and remove it if found
-            sort = args.get("sort", None)
-            if sort:
-                args.pop("sort")
-
-            # Check for 'select' argument, and remove it if found
-            select = args.get("select", None)
-            if select:
-                args.pop("select")
+            # Check for 'sort' and 'select' argument, and remove if found
+            sort = args.pop("sort", None)
+            select = args.pop("select", None)
 
             # Apply the filters
             q = q.filter_by(**args)
@@ -35,7 +29,7 @@ class ListCerealAPI(Resource):
                     return f"Unknown sort param '{sort}'", 400
                 q = q.order_by(attr)
 
-            # Apply optional select
+            # Apply optional select(s)
             if select:
                 attr = [getattr(Cereal, s, None) for s in select.split(",")]
                 q = q.with_entities(*attr)
@@ -86,7 +80,7 @@ class ImageAPI(Resource):
         if cereal:
             # weird path descrepancy
             img = f"data/img/{cereal.name}.jpg"
-            if exists(img):
+            if genericpath.exists(img):
                 return send_file("../" + img, mimetype="image/jpeg")
             else:
                 return "file not found", 400
