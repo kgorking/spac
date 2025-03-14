@@ -2,7 +2,6 @@ import requests
 import json
 
 url = 'http://localhost:81/image/1333'
-
 response = requests.get(url)
 
 if response.status_code == 200:
