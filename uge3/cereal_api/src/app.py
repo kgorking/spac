@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash
 app = Flask(__name__)
 app.instance_path = "data"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cereals.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
 app.secret_key = "6d6a710e529aeaaa20dbcaf5edd1519501522b5ba5bb172132de898a2783a4cd"
 
@@ -42,4 +41,4 @@ if __name__ == "__main__":
             db.session.commit()
 
     # Start the server
-    app.run(debug=True, host="0.0.0.0", port=81) #, ssl_context='adhoc')
+    app.run(debug=False, host="0.0.0.0", port=81) #, ssl_context='adhoc')
