@@ -2,39 +2,39 @@
 # Script to run through all the endpoints
 #
 
-print("Running tests...")
+print("Running tests")
 
-print("  login")
+print("  Testing login...")
 import login
 
-print("  logout")
+print("  Testing logout...")
 import logout
 
-print("  getting all cereals")
+print("  Testing get all cereals...")
 import list_all_cereals
 
-print("  getting cereals with filter")
+print("  Testing get cereals with filter...")
 import list_all_filter
 
-print("  getting cereals sorted")
+print("  Testing get cereals sorted...")
 import list_all_sorted
 
-print("  getting cereals selected")
+print("  Testing get cereals with select...")
 import list_all_select
 
-print("  getting one cereal")
+print("  Testing get one cereal...")
 import list_one_cereal
 
-print("  create new cereal")
+print("  Testing create new cereal...")
 import create_cereal
 
-print("  update new cereal")
+print("  Testing update new cereal...")
 import update_cereal
 
-print("  delete new cereal")
+print("  Testing delete new cereal...")
 import delete_cereal
 
-print("  image endpoint")
+print("  Testing image endpoint...")
 import get_cereal_image
 
 print("Done! All is good")
