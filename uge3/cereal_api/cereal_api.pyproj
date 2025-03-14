@@ -12,6 +12,7 @@
     <Name>cereal_api</Name>
     <RootNamespace>cereal_api</RootNamespace>
     <InterpreterId>MSBuild|.venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
