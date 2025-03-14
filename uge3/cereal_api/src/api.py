@@ -39,15 +39,23 @@ class UpdateCerealAPI(Resource):
 class ListCerealAPI(Resource):
     def get(self):
         if request.args:
+            # Convert to a dict I can modify
             args = request.args.to_dict()
+
+            # Check for 'sort' argument, and remove it if found
             sort = args.get('sort', None)
             if sort:
                 args.pop('sort')
 
+            # Apply the filters
             q = Cereal.query.filter_by(**args)
 
+            # Apply optional column sorting
             if sort:
-                q = q.order_by(getattr(Cereal, sort))
+                attr = getattr(Cereal, sort, None)
+                if not attr:
+                    return f"Unknown sort param '{sort}'", 400
+                q = q.order_by(attr)
 
             return jsonify(q.all())
         else:
