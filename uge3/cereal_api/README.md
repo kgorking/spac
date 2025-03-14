@@ -42,8 +42,8 @@ http://localhost:81/api/cereal/2
 
 * Filter: `/api/cereal?calories=50` returner alle morgenmadsprodukter der indeholder 50 kalorier.
 * Select: `/api/cereal?select=name,fiber` returner kun 'name' og 'fiber' kolonnerne.
-* Sorter: `/api/cereal?sort=name` sorter på en nøgle.
-* Kan kombineres: `/api/cereal?select=name,calories&sort=calories`
+* Sorter: `/api/cereal?sort=fat` sorter på 'fat'.
+* Kan kombineres: `/api/cereal?select=name,calories&sort=fat`
 
 `/api/cereal/create`: Opret en ny morgenmad. `name` og `mfr` er påkrævet.
 
@@ -57,15 +57,13 @@ http://localhost:81/api/cereal/2
 
 `/api/image/<id>`: Hent et billede til den angivne morgenmad
 
-`api/cereal?sort=fat` returnerer alle morgenmadsprodukter sorteret efter deres fedtindhold.
-
 
 # Design
 Lavet med:
 * Flask, til opsætning af http server
 * Flask RESTful, til opsætning af endpoints
 * Flask Login, til at håndtere autentifikation
-* SQLAlchemy, til at håndtere data til/fra databasen
+* Flask SQLAlchemy, til at håndtere data til/fra databasen
 
 ## Begrundelse for design
 Teknologier er valgt fordi, at det var dem jeg kunne få til at virke 👍.
