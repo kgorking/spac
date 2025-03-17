@@ -3,7 +3,6 @@ import json
 from flask import jsonify, request, send_file
 from flask_restful import Api, Resource
 from flask_login import login_user, logout_user, login_required
-from flask_limiter import Limiter, util
 from werkzeug.security import check_password_hash
 from models import db, Cereal, User
 
