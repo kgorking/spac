@@ -3,16 +3,15 @@ from tqdm import tqdm
 from urllib.parse import urlparse
 import asyncio
 import aiohttp
-import ssl
 import urllib.parse
 import pandas
 import os
+import sys
 
-excel_file = "./data/GRI_2017_2020 (1).xlsx"
-output_folder = "./download/"
-max_retries = 3
-url_timeout = 45.0
-developer_mode = False
+excel_file     = sys.argv[1] if len(sys.argv) > 1 else "./data/GRI_2017_2020 (1).xlsx"
+output_folder  = sys.argv[2] if len(sys.argv) > 2 else "./download/"
+url_timeout    = 15.0
+developer_mode = True
 
 # Headers used to pretend we are a browser.
 # Some sites reject requests if they do not look like
@@ -22,13 +21,14 @@ headers = {
     "sec-ch-ua": '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"',
     "sec-ch-ua-mobile": "?0",
     "sec-ch-ua-platform": '"Windows"',
-    # "Upgrade-Insecure-Requests": "1",
+    "Upgrade-Insecure-Requests": "1",
     "Accept-encoding": "gzip, deflate, zstd",
-    # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    #"Accept": "text/html,application/xhtml+xml,application/xml",
+    "Accept": "application/pdf,application/octet-stream,binary/octet-stream",
 }
 
 
-def extract_report_names():
+def extract_report_names() -> tuple[tuple[str,str,str], int]:
     """
     Extract the report names from the excel file.
     Returns a zip object and the total count of files.
@@ -49,33 +49,29 @@ def extract_report_names():
     return report_names, num_cells
 
 
-async def download_file(session: aiohttp.ClientSession, tuple_data) -> str:
+async def download_file(session: aiohttp.ClientSession, tuple_data: tuple[str,str,str]) -> tuple[int, str, str|None]:
     """
-    Tries to download a pdf file from the specified urls.
+    Tries to download a pdf file from one of the two urls.
     """
     filename, link1, link2 = tuple_data
-    outname = output_folder + filename + ".pdf"
+    outname = os.path.join(output_folder, filename+".pdf")
 
     # Don't download existing reports
     if exists(outname):
-        return ""  # f"0\t{filename}\n"
+        return 3, filename, None
 
     # Empty cells become 'float', for some reason
     link1 = None if type(link1) is float else link1
     link2 = None if type(link2) is float else link2
 
-    err = ""
-    retries = dict()
+    err = None
+    timeout_link = None
 
     # Try links
     links = [link1, link2]
     while len(links) > 0:
         link: str = links.pop(0)
         if not link:
-            continue
-
-        if retries.get(link, 0) == max_retries:
-            err = f"retries exhausted: {link}\n"
             continue
 
         # Ignore local files
@@ -85,7 +81,7 @@ async def download_file(session: aiohttp.ClientSession, tuple_data) -> str:
         # Fix html
         if link.startswith('<a href="'):
             link = link[len('<a href="') :]
-            link = link[: link.find('"')]
+            link = link[:link.find('"')]
 
         # Fix address starting with a dot
         if link[0] == ".":
@@ -94,102 +90,165 @@ async def download_file(session: aiohttp.ClientSession, tuple_data) -> str:
         # Patch incomplete urls
         url = urlparse(link)
         if len(url.scheme) == 0:
-            # print("patching: ", link)
-            # links.insert(0, "ftp://" + link)
-            links.insert(0, "http://" + link)
-            links.insert(0, "https://" + link)
-            continue
+            #links.insert(0, "ftp://" + link)
+            #links.insert(0, "http://" + link)
+            link = "https://" + link
 
         try:
+            # Download the file
+            # - 'max_field_size' is set to 16K, because some sites return more
+            #   than the default 8K bytes allowed
+            # - 'headers' is used to pretend we are a browser. Some sites
+            #   seem to reject requests without headers
+            # - 'allow_redirects' determines if the destination site can
+            #   send us somewhere else.
+            # - 'chunked' requests that data is sent in chunks, and
+            #   not all at once.
+            # - 'timeout' sets timelimits on socket connections
+            # - 'raise_for_status' 404/403/etc. status codes raise exceptions.
             async with session.get(
                 link,
                 max_field_size=16 * 1024,  # 16k bytes response headers
                 headers=headers,
                 allow_redirects=True,
                 chunked=True,
-                timeout=aiohttp.ClientTimeout(
-                    sock_connect=url_timeout, sock_read=url_timeout
-                ),
-                # raise_for_status=True,
+                timeout=aiohttp.ClientTimeout(sock_connect=url_timeout, sock_read=url_timeout),
+                raise_for_status=True,
             ) as response:
-                accepted_content_types = [
-                    "application/pdf",
-                    "application/octet-stream",
-                    "binary/octet-stream",
-                ]
-
-                if not response.content_type in accepted_content_types:
-                    err = f"Link did not return a pdf for '{link}': {response.content_type}\n"
+                # Check that the returned data is correct format
+                if -1 == headers['Accept'].find(response.content_type):
+                    err = f"Wrong content-type '{response.content_type}' for '{link}'\n"
                     continue
 
-                # if not response.content_length or response.content_length <= 8192:
-                #    err = f"13\t{filename}\tbad sized pdf for '{link}': {response.content_length}\n"
-                #    continue
-
                 try:
+                    # Write the file to the drive
                     with open(outname, "wb") as file:
-                        # file.write((response.content_length * "X").encode())
-                        async for chunk in response.content.iter_any():
-                            file.write(chunk)
+                        if developer_mode and int(response.content_length) > 8192:
+                            # Don't bother downloading large files, just fill it
+                            # with X's matching the file size
+                            size = response.content_length if response.content_length else 1
+                            file.write((size * "X").encode())
+                        else:
+                            # Do a chunked download of the pdf file
+                            async for chunk in response.content.iter_any():
+                                file.write(chunk)
 
-                    if os.path.getsize(outname) > 0:
-                        err = ""
-                        break
+                    # Verify that the file is not empty
+                    if (os.path.getsize(outname) > 0):
+                        return 0, filename, None
                     else:
                         os.remove(outname)
-                        err = f"bad sized pdf\n"
+                        err = f"received empty pdf\n"
+                        break
                 except aiohttp.http_exceptions.ContentLengthError as cle:
-                    retries[link] = 1 + retries.get(link, 0)
-                    links.insert(0, link)
+                    # Error happened during download, so retry the link
+                    os.remove(outname)
+                    timeout_link = link
+                    break
                 except Exception as e:
                     os.remove(outname)
                     err = f"file exception for '{link}' {e}\n"
                     break
         except TimeoutError as e:
-            retries[link] = 1 + retries.get(link, 0)
-            links.insert(0, link)
+            # Time-out happened during download, so retry the link
+            timeout_link = link
+            break
         except Exception as e:
             err = f"{type(e)} - '{e}': '{link}'\n"
 
-    if 0 == len(err):
-        return filename, None
+    if timeout_link:
+        return 2, filename, timeout_link
+    elif err:
+        return 1, filename, err
     else:
-        return filename, err
+        return 0, filename, None
 
 
 async def download_all_files():
+    """
+    Tries to download pdf files from the specified excel file.
+    """
+    # Create the download folder if it doesn't exists
     if not exists(output_folder):
         os.mkdir(output_folder)
 
+    # Pull the links from the excel file, including the count
     report_data, count = extract_report_names()
 
+    # Create the session used for the downloads.
+    # - Attach a cookie jar. This is needed for sites that redirect pages.
+    # - The connector does not validate ssl, and the connection limit is set to 100
+    # - Disable timeouts. The list is large, so items at the end can hit a timeout.
     session = aiohttp.ClientSession(
         cookie_jar=aiohttp.CookieJar(),
-        connector=aiohttp.TCPConnector(ssl=False, limit=500),
+        connector=aiohttp.TCPConnector(ssl=False, limit=100),
         timeout=aiohttp.ClientTimeout(total=0),
     )
 
+    # Lists of successful, failed, and downloads that need to be retried
     good = []
     bad = []
+    retry = []
 
-    async with session:
-        tasks = [download_file(session, tuple_data) for tuple_data in report_data]
+    # Helper function to handle the status of completed download
+    def handle_status(status: int, filename: str, error):
+        if 0 == status:
+            good.append(filename + "\n")
+        elif 1 == status:
+            bad.append(filename + "\t" + error)
+        elif 2 == status:
+            retry.append((filename, error))
+        elif 3 == status:
+            # already downloaded, so ignore
+            return
+        else:
+            bad.append(filename + "\terror: unknown status")
 
-        for f in tqdm(asyncio.as_completed(tasks), unit="pdf", total=count):
-            try:
-                filename, error = await f
-                if not error:
-                    good.append(filename)
-                else:
-                    bad.append(filename + "\t" + error)
-            except Exception as e:
-                bad.append("async io error\t" + str(e))
+    # Do the actual downloads
+    try:
+        async with session:
+            # Generate a list of tasks from the data extracted from the excel file
+            tasks = [download_file(session, tuple_data) for tuple_data in report_data]
 
-    with open("report.csv", "wt") as report:
-        for file in good:
-            report.write("0\t" + result)
-        for error in bad:
-            report.write("1\t" + error)
+            # Fire up the downloads
+            for f in tqdm(asyncio.as_completed(tasks), unit="pdf", total=count):
+                try:
+                    status, filename, error = await f
+                    handle_status(status, filename, error)
+                except Exception as e:
+                    bad.append("async io error\t" + str(e) + '\n')
+
+            print(f'Downloaded {len(good)} pdf files')
+
+            # Retry links that might work
+            count = len(retry)
+            prev_good_files = len(good)
+            if count > 0:
+                print(f"Retrying {count} links...")
+                tasks = [download_file(session, (f, l, None)) for f, l in retry]
+                retry.clear()
+
+                for f in tqdm(asyncio.as_completed(tasks), unit="pdf", total=count):
+                    try:
+                        status, filename, error = await f
+                        handle_status(status, filename, error)
+                    except Exception as e:
+                        bad.append("async io error\t" + str(e) + '\n')
+
+                good_retries = len(good) - prev_good_files
+                print(f"{good_retries} retries succeeded, {len(good)} pfd files downloaded total")
+    except Exception as e:
+        print(f"Exception caught while downloading: '{e}'")
+        print( "Please re-run the script to try again.")
+    finally:
+        # Write out the report of good/bad downloads
+        with open("report.csv", "wb") as report:
+            for filename in good:
+                report.write(f"0\t{filename}".encode())
+
+            for err in bad:
+                report.write(f"1\t{err}".encode())
+
 
 
 if __name__ == "__main__":
